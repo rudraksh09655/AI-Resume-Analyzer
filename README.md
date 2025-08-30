@@ -1,9 +1,9 @@
-AI-Powered Resume Analyzer
+# AI-Powered Resume Analyzer
 An intelligent web application that provides instant, data-driven feedback on resumes. Users can upload their resume (PDF or DOCX) and receive a comprehensive analysis of its structure, content, and ATS-friendliness, powered by the Google Gemini API.
 
 
 
-✨ Key Features
+#  ✨ Key Features
 File Upload: Securely upload resumes in PDF or DOCX format.
 
 AI-Powered Analysis: Leverages the Google Gemini API to generate an in-depth "Resume Report Card."
@@ -16,8 +16,8 @@ Resume Improvement: Includes a feature to automatically rewrite and enhance the 
 
 Modern UI: A clean, professional, and responsive user interface built with Flask and Tailwind CSS.
 
-🛠️ Technology Stack
-Backend:
+# 🛠️ Technology Stack
+# Backend:
 
 Python 3
 
@@ -29,7 +29,7 @@ PyMuPDF (fitz): For extracting text from PDF files.
 
 python-docx: For extracting text from DOCX (Microsoft Word) files.
 
-Frontend:
+# Frontend:
 
 HTML5
 
@@ -37,7 +37,7 @@ Tailwind CSS: For modern, utility-first styling.
 
 Vanilla JavaScript: For handling file uploads and dynamic UI updates via Fetch API.
 
-🚀 Getting Started
+# 🚀 Getting Started
 To get a local copy up and running, follow these simple steps.
 
 Prerequisites
@@ -75,7 +75,7 @@ Replace PASTE_YOUR_API_KEY_HERE with your actual Google Gemini API key.
 
 GEMINI_API_KEY="YOUR_SECRET_API_KEY"
 
-Running the Application
+# Running the Application
 Start the Flask server:
 
 flask run
