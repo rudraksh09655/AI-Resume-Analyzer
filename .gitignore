@@ -1,0 +1,18 @@
+--- Environment Variables ---
+Ignore the file containing secret keys. This is the most important line!
+.env
+
+--- Python Virtual Environment ---
+Ignore the virtual environment folder, which contains packages specific to your machine and can be very large.
+venv/
+.venv/
+
+--- Python Cache ---
+Ignore Python's generated cache files to keep the repository clean.
+pycache/
+*.pyc
+
+--- IDE/Editor Specific ---
+Ignore configuration files from your code editors.
+.idea/
+.vscode/

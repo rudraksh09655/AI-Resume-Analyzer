@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RESUME ANALYZER</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@600&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #f0f2f5; 
+        }
+        h1, h2, h3 {
+            font-family: 'Lora', serif;
+        }
+        .grade-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .grade-A { background-color: #10B981; } /* Green-500 */
+        .grade-B { background-color: #3B82F6; } /* Blue-500 */
+        .grade-C { background-color: #F59E0B; } /* Amber-500 */
+        .grade-D, .grade-F { background-color: #EF4444; } /* Red-500 */
+
+        .report-card li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: #3b82f6; /* Blue-500 */
+            font-weight: 700;
+            font-size: 1.25rem;
+            top: -4px;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="min-h-screen">
+        <header class="bg-white shadow-md">
+            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                <h1 class="text-3xl font-bold text-gray-900">AI RESUME ANALYZER</h1>
+                <p class="text-gray-600 mt-1">An academic approach to resume analysis.</p>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Left Column: Input -->
+                <section class="bg-white p-8 rounded-lg shadow-lg">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Submit Your Resume</h2>
+                    <!-- FILE UPLOAD ZONE -->
+                    <div id="file-upload-zone" class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-800 transition duration-300">
+                        <input type="file" id="resume-file-input" class="hidden" accept=".pdf,.docx,.txt">
+                        <div id="upload-prompt">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            <p class="mt-2 text-gray-600">Drag & drop your resume here, or <span class="font-bold text-gray-800">click to upload</span></p>
+                            <p class="mt-1 text-xs text-gray-500">PDF, DOCX, or TXT</p>
+                        </div>
+                        <div id="file-name-display" class="hidden text-lg font-medium text-gray-700"></div>
+                    </div>
+                    <button id="analyze-btn" class="mt-4 w-full bg-gray-800 text-white font-bold py-3 px-4 rounded-md hover:bg-gray-900 transition-transform transform hover:scale-105 duration-200">Grade My Resume</button>
+                </section>
+
+                <!-- Right Column: Report Card Output -->
+                <section id="report-section" class="bg-white p-8 rounded-lg shadow-lg">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Evaluation Report</h2>
+                    <div id="output-container" class="h-full min-h-[500px]">
+                        <!-- States -->
+                        <div id="initial-state" class="flex flex-col items-center justify-center h-full text-center">
+                            <h3 class="text-xl font-semibold text-gray-600">Awaiting Submission</h3>
+                            <p class="text-gray-500 mt-1">Your detailed report card will be generated here.</p>
+                        </div>
+                        <div id="loading-state" class="hidden flex-col items-center justify-center h-full"><p class="text-lg font-medium text-gray-700 animate-pulse">Evaluating...</p></div>
+                        <div id="error-state" class="hidden flex-col items-center justify-center h-full text-center"><h3 class="text-xl font-semibold text-red-700">Evaluation Error</h3><p id="error-message" class="text-gray-500 mt-1"></p></div>
+                        
+                        <!-- Results -->
+                        <div id="results-state" class="hidden">
+                            <div class="text-center border-b pb-6 mb-6">
+                                <h3 class="text-lg font-semibold text-gray-600">Overall Grade</h3>
+                                <div id="overall-grade" class="grade-badge w-24 h-24 mx-auto mt-2 text-4xl">--</div>
+                            </div>
+                            <div id="feedback-output" class="space-y-6"></div>
+                            <button id="improve-btn" class="mt-8 w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-md hover:bg-blue-700 transition-transform transform hover:scale-105">✨ Generate Revision</button>
+                            <div id="improved-resume-container" class="hidden mt-6">
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">Suggested Revision:</h3>
+                                <div id="improved-resume-output" class="w-full p-4 border bg-gray-50 rounded-md whitespace-pre-wrap font-mono text-sm"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const analyzeBtn = document.getElementById('analyze-btn');
+        const improveBtn = document.getElementById('improve-btn');
+        const fileUploadZone = document.getElementById('file-upload-zone');
+        const resumeFileInput = document.getElementById('resume-file-input');
+        const uploadPrompt = document.getElementById('upload-prompt');
+        const fileNameDisplay = document.getElementById('file-name-display');
+        
+        const initialState = document.getElementById('initial-state');
+        const loadingState = document.getElementById('loading-state');
+        const resultsState = document.getElementById('results-state');
+        const errorState = document.getElementById('error-state');
+        
+        const overallGradeEl = document.getElementById('overall-grade');
+        const feedbackOutput = document.getElementById('feedback-output');
+        const improvedResumeContainer = document.getElementById('improved-resume-container');
+        const improvedResumeOutput = document.getElementById('improved-resume-output');
+        const errorMessage = document.getElementById('error-message');
+
+        const BACKEND_URL = 'http://127.0.0.1:5000';
+
+        // FILE UPLOAD SCRIPT
+        fileUploadZone.addEventListener('click', () => resumeFileInput.click());
+        resumeFileInput.addEventListener('change', () => handleFileSelect(resumeFileInput.files));
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            fileUploadZone.addEventListener(eventName, preventDefaults, false)
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        fileUploadZone.addEventListener('dragenter', () => fileUploadZone.classList.add('border-gray-800', 'bg-gray-50'));
+        fileUploadZone.addEventListener('dragleave', () => fileUploadZone.classList.remove('border-gray-800', 'bg-gray-50'));
+        fileUploadZone.addEventListener('drop', (e) => {
+            fileUploadZone.classList.remove('border-gray-800', 'bg-gray-50');
+            handleFileSelect(e.dataTransfer.files);
+        }, false);
+
+        function handleFileSelect(files) {
+            if (files.length > 0) {
+                resumeFileInput.files = files; 
+                const file = files[0];
+                fileNameDisplay.textContent = file.name;
+                uploadPrompt.classList.add('hidden');
+                fileNameDisplay.classList.remove('hidden');
+            }
+        }
+
+        function setUIState(state) {
+            ['initial', 'loading', 'results', 'error'].forEach(s => {
+                document.getElementById(`${s}-state`).classList.add('hidden');
+            });
+            document.getElementById(`${state}-state`).classList.remove('hidden');
+        }
+        
+        function getGradeClass(grade) {
+            if (grade.startsWith('A')) return 'grade-A';
+            if (grade.startsWith('B')) return 'grade-B';
+            if (grade.startsWith('C')) return 'grade-C';
+            return 'grade-D';
+        }
+
+        function displayAnalysis(text) {
+            const overallGradeMatch = text.match(/Overall Grade: ([A-DF][+-]?)/);
+            if (overallGradeMatch) {
+                const grade = overallGradeMatch[1];
+                overallGradeEl.textContent = grade;
+                overallGradeEl.className = `grade-badge w-24 h-24 mx-auto mt-2 text-4xl ${getGradeClass(grade)}`;
+            }
+
+            let html = '';
+            const sections = text.split('###').slice(1);
+            sections.forEach(section => {
+                const lines = section.trim().split('\n');
+                const titleLine = lines.shift().trim();
+                const titleMatch = titleLine.match(/(.*): ([A-DF][+-]?)/);
+                if (titleMatch) {
+                    const title = titleMatch[1];
+                    const grade = titleMatch[2];
+                    html += `<div class="report-card">
+                                <div class="flex justify-between items-center">
+                                    <h3 class="text-xl font-bold text-gray-800">${title}</h3>
+                                    <div class="grade-badge w-12 h-12 text-xl ${getGradeClass(grade)}">${grade}</div>
+                                </div>
+                                <ul class="mt-4 space-y-2 pl-5">`;
+                    lines.forEach(line => {
+                        if (line.trim().startsWith('*')) {
+                            html += `<li class="relative">${line.trim().substring(1).trim()}</li>`;
+                        }
+                    });
+                    html += `</ul></div>`;
+                }
+            });
+            feedbackOutput.innerHTML = html;
+        }
+
+        async function handleApiCall(endpoint) {
+            const file = resumeFileInput.files[0];
+            if (!file) {
+                alert("Please upload a resume file.");
+                return null;
+            }
+
+            const formData = new FormData();
+            formData.append('resume_file', file);
+
+            try {
+                const response = await fetch(`${BACKEND_URL}${endpoint}`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Server error.');
+                return data;
+            } catch (error) {
+                errorMessage.textContent = error.message;
+                setUIState('error');
+                return null;
+            }
+        }
+
+        analyzeBtn.addEventListener('click', async () => {
+            setUIState('loading');
+            improvedResumeContainer.classList.add('hidden');
+            const data = await handleApiCall('/analyze');
+            if (data) {
+                displayAnalysis(data.feedback);
+                setUIState('results');
+            }
+        });
+
+        improveBtn.addEventListener('click', async () => {
+            improveBtn.textContent = "Generating...";
+            improveBtn.disabled = true;
+
+            const data = await handleApiCall('/improve');
+            if (data) {
+                improvedResumeOutput.textContent = data.improved_resume;
+                improvedResumeContainer.classList.remove('hidden');
+            }
+
+            improveBtn.textContent = "✨ Generate Revision";
+            improveBtn.disabled = false;
+        });
+    </script>
+</body>
+</html>
+
